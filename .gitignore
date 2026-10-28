@@ -1,0 +1,33 @@
+# ---- Python -------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# ---- Secrets ------------------------------------------------------------
+# Never commit a real key. .env.example is the template and IS committed.
+.env
+.env.local
+.env.*.local
+
+# ---- Runtime state (generated per user, not source) ---------------------
+sessions/
+data/
+content/_calibration.json
+
+# ---- Generated topics from a pasted syllabus ---------------------------
+# These are per-user content. Keep the two authored topics, ignore the rest.
+content/*.json
+!content/recursion.json
+!content/normalization.json
+
+# ---- OS / editor --------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

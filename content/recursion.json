@@ -1,0 +1,1035 @@
+{
+ "id": "recursion",
+ "title": "Recursion",
+ "subject": "Data Structures & Algorithms",
+ "blurb": "Trace a function calling itself: the stack, the base case, and why returns come back backwards.",
+ "concepts": [
+  {
+   "id": "function_calls",
+   "name": "How Function Calls Work",
+   "prereqs": [],
+   "summary": "A call pauses the caller, runs the callee, and hands back a single value to exactly the line where the call happened.",
+   "analogy": "Leaving a bookmark in a book to go read a footnote - you come back to the exact line, not the top of the page.",
+   "key_ideas": [
+    "a call transfers control and later returns it to the call site",
+    "a call evaluates to one return value",
+    "arguments are copied into the new call's own parameters"
+   ],
+   "worked": [
+    "main() runs, reaches the line `x = greet()`",
+    "greet() starts with its own fresh scope; main() is paused, not finished",
+    "greet() hits `return 'hi'`",
+    "control returns to main(), `x` becomes 'hi', execution continues on the next line"
+   ]
+  },
+  {
+   "id": "call_stack",
+   "name": "The Call Stack & Frames",
+   "prereqs": [
+    "function_calls"
+   ],
+   "summary": "Every active call owns a frame holding its own parameters and locals. Frames are pushed on call and popped on return, last-in-first-out.",
+   "analogy": "A stack of sticky notes: you can only add to the top and remove from the top.",
+   "key_ideas": [
+    "each call gets its own separate frame",
+    "locals belong to a frame, they are not shared between calls",
+    "frames are removed in reverse order of creation",
+    "deep recursion grows the stack until it overflows"
+   ],
+   "worked": [
+    "call f(3) -> push frame [n=3]",
+    "f(3) calls f(2) -> push frame [n=2]; stack is now 3, 2",
+    "f(2) calls f(1) -> push frame [n=1]; stack is 3, 2, 1",
+    "f(1) returns -> pop n=1; f(2)'s frame is intact, still holding n=2"
+   ]
+  },
+  {
+   "id": "base_case",
+   "name": "The Base Case",
+   "prereqs": [
+    "call_stack"
+   ],
+   "summary": "The base case is a branch that returns without calling itself. Every chain of calls must be able to reach one.",
+   "analogy": "The bottom rung of a ladder. Without it you keep climbing down with nothing to stop you.",
+   "key_ideas": [
+    "the base case returns without recursing",
+    "it must be reachable from the initial call",
+    "every recursive path must eventually reach it"
+   ],
+   "worked": [
+    "write the recursive step: fact(n) = n * fact(n-1)",
+    "ask: what input can I answer without recursing? n <= 1 -> 1",
+    "check reachability: n-1 eventually reaches 1 for every n >= 1",
+    "test the edge: fact(0) must also return 1, so use `n <= 1`, not `n == 1`"
+   ]
+  },
+  {
+   "id": "recursive_case",
+   "name": "The Recursive Case",
+   "prereqs": [
+    "call_stack"
+   ],
+   "summary": "The recursive case solves a strictly smaller version of the same problem, and is allowed to assume that smaller call is already correct.",
+   "analogy": "Standing in a queue and asking the person ahead of you for their position. You trust them to work out the rest.",
+   "key_ideas": [
+    "each recursive call must receive a strictly smaller input",
+    "you may assume the recursive call returns the correct answer",
+    "the returned value must be combined and handed back"
+   ],
+   "worked": [
+    "goal: power(2, 3)",
+    "assume the smaller call works: power(2, 2) = 4",
+    "do the one step that turns it into the answer: 2 * 4 = 8",
+    "verify the input shrank: 3 -> 2, so this terminates"
+   ]
+  },
+  {
+   "id": "unwinding",
+   "name": "Return Values & Unwinding",
+   "prereqs": [
+    "base_case",
+    "recursive_case"
+   ],
+   "summary": "Returns happen in reverse order of the calls. The innermost call finishes first and its value flows outward one frame at a time.",
+   "analogy": "Folding a stack of letters: the last one written is the first one read.",
+   "key_ideas": [
+    "returns occur in reverse call order",
+    "each frame receives the value returned by the call it made",
+    "a returned value is lost if the caller does not use it"
+   ],
+   "worked": [
+    "f(3) calls f(2), which calls f(1), which returns 1",
+    "that 1 lands in f(2)'s frame; f(2) computes 2 + 1 and returns 3",
+    "that 3 lands in f(3)'s frame; f(3) computes 3 + 3 and returns 6",
+    "notice: the values come back in reverse order of the calls, one frame at a time"
+   ]
+  },
+  {
+   "id": "recursion_tree",
+   "name": "Recursion Trees",
+   "prereqs": [
+    "unwinding"
+   ],
+   "summary": "A call that makes more than one recursive call produces a branching tree. Total work is the number of nodes, not the depth.",
+   "analogy": "A family tree where everyone has two children. The bottom row is enormous even though the tree is short.",
+   "key_ideas": [
+    "branching factor drives total call count",
+    "total work is the number of nodes",
+    "depth still governs stack memory"
+   ],
+   "worked": [
+    "fib(5) calls fib(4) and fib(3)",
+    "fib(4) calls fib(3) and fib(2) - note fib(3) is computed twice already",
+    "level 0 has 1 node, level 1 has 2, level 2 has 4, level 3 has 8",
+    "total nodes for depth d is about 2^d, which is why fib(40) hangs"
+   ]
+  },
+  {
+   "id": "complexity",
+   "name": "Time & Space Complexity",
+   "prereqs": [
+    "recursion_tree"
+   ],
+   "summary": "Recursion always spends stack space proportional to its maximum depth, even when its time cost is good.",
+   "analogy": "A chain of phone calls: even if only one person is talking, everybody stays on the line.",
+   "key_ideas": [
+    "space is proportional to maximum depth",
+    "time is driven by how many calls are made",
+    "memoization trades space to buy back time"
+   ],
+   "worked": [
+    "sum_to(n) recurses to depth n before returning anything",
+    "at the deepest point the stack holds n frames - that is O(n) space",
+    "the number of calls is also n - that is O(n) time",
+    "rewrite as a loop and the frames disappear: O(n) time, O(1) space"
+   ]
+  },
+  {
+   "id": "memoization",
+   "name": "Memoization",
+   "prereqs": [
+    "recursion_tree",
+    "complexity"
+   ],
+   "summary": "Cache the results of subproblems you have already solved. It only pays off when the same subproblem is reached repeatedly.",
+   "analogy": "Writing answers on a sticky note so you never redo the same sum twice.",
+   "key_ideas": [
+    "it requires overlapping subproblems",
+    "the cache is keyed by the arguments",
+    "it collapses an exponential tree into a linear chain of unique states"
+   ],
+   "worked": [
+    "fib(5) -> fib(4), fib(3)",
+    "fib(4) -> fib(3), fib(2)   <-- fib(3) is now being recomputed",
+    "store fib(3) in a dict the first time you compute it",
+    "the second request for fib(3) is a dict lookup, not a subtree",
+    "the exponential tree collapses into a linear chain of n+1 unique values"
+   ]
+  },
+  {
+   "id": "tail_recursion",
+   "name": "Tail Recursion & Stack Depth",
+   "prereqs": [
+    "unwinding",
+    "complexity"
+   ],
+   "summary": "A call is tail-recursive when the recursive call is the final action and its result is returned unchanged. Some languages reclaim the frame; Python does not.",
+   "analogy": "Handing over a baton at the end of a lap. There is nothing left to remember about the previous lap.",
+   "key_ideas": [
+    "the recursive call must be the last operation",
+    "its value must be returned directly, not combined afterwards",
+    "tail-call optimisation is a language feature, never automatic in Python"
+   ],
+   "worked": [
+    "non-tail: return n * f(n-1) - the multiplication happens after the call returns",
+    "tail:     return f(n-1, acc+n) - nothing happens after the call returns",
+    "in tail position the current frame has no remaining work",
+    "so a runtime that supports TCO can reuse the frame instead of pushing a new one",
+    "CPython does not do this, so Python still raises RecursionError at the limit"
+   ]
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "M_NO_BASE",
+   "name": "Recursion stops on its own",
+   "statement": "A recursive function terminates as long as it looks like it is getting smaller, so an explicit base case is optional.",
+   "why": "Termination requires that some call actually returns without recursing. If none does, the chain continues until the stack overflows - the base case is not a formality, it is the only thing that ends the process.",
+   "repair": "Find the branch that returns a plain value. If there is none, you have written an infinite chain, not a recursion."
+  },
+  {
+   "id": "M_SHARED_VARS",
+   "name": "Recursive calls share one set of variables",
+   "statement": "All the calls are working on the same variable, so changing it in one call changes it everywhere.",
+   "why": "Each call gets its own frame. The parameter in one call is a different variable from the parameter in another, even though they share a name.",
+   "repair": "Picture the stack: n=3, then n=2, then n=1, each in its own box. When n=2 returns, the n=3 box still holds 3."
+  },
+  {
+   "id": "M_RETURN_ORDER",
+   "name": "Returns come back in the order they were called",
+   "statement": "If f(3) called f(2) first, then f(3) returns first too.",
+   "why": "Calls go down the stack and returns come back up it, so the order reverses. The innermost call is the first to finish and the last to be made.",
+   "repair": "Read the print statements in two passes: everything before the recursive call prints on the way down, everything after prints on the way up, reversed."
+  },
+  {
+   "id": "M_RETURN_LOST",
+   "name": "The recursive result comes back automatically",
+   "statement": "You can just call the function recursively and the answer will find its way to the caller.",
+   "why": "A return value only reaches the caller if the caller uses it - by returning it, storing it, or combining it. A bare call throws the value away.",
+   "repair": "Every recursive call must appear inside a return, or be assigned to something that is later returned."
+  },
+  {
+   "id": "M_DEPTH_FREE",
+   "name": "Recursion costs no extra memory",
+   "statement": "Recursion is just a compact way of writing a loop, so it uses no additional memory.",
+   "why": "Every call that has not returned yet is holding a live frame. Memory grows with maximum depth, which is why deep recursion can overflow.",
+   "repair": "Count the boxes on the stack at the deepest point. That count is your space complexity."
+  },
+  {
+   "id": "M_TREE_LINEAR",
+   "name": "Two recursive calls still mean linear time",
+   "statement": "A function with two recursive calls just does twice the work per level, so it is still O(n).",
+   "why": "Two calls per level means the number of calls doubles at every level: 1, 2, 4, 8 ... That is 2^depth total calls, which is exponential, not linear.",
+   "repair": "Draw the call tree for n=4 and count the nodes. If each level doubles, the total is exponential."
+  },
+  {
+   "id": "M_MEMO_MAGIC",
+   "name": "Memoization speeds up any recursion",
+   "statement": "Adding a cache makes any recursive function faster.",
+   "why": "A cache only helps if the same subproblem is reached more than once. If every subproblem is unique the cache never hits, and you have added overhead for nothing.",
+   "repair": "Ask whether two different paths can arrive at the same arguments. If not, there is nothing to cache."
+  },
+  {
+   "id": "M_TAIL_OPT",
+   "name": "Tail recursion is optimised automatically",
+   "statement": "Writing the recursive call last means the interpreter will optimise it into a loop.",
+   "why": "Tail-call optimisation is a property of the language and compiler. Python has no TCO and enforces a recursion limit, so a tail-recursive Python function still overflows.",
+   "repair": "Tail position is necessary but not sufficient - check whether your runtime actually performs TCO."
+  }
+ ],
+ "items": [
+  {
+   "id": "r01",
+   "concept": "function_calls",
+   "difficulty": -1.3,
+   "stem": "What happens the moment `greet()` is called from inside `main()`?",
+   "options": [
+    {
+     "text": "Control jumps to greet(); when it returns, main() resumes at the exact next line",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "main() keeps running at the same time as greet()",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "greet() runs, then the whole program restarts from the top",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "greet() runs but main() never receives a value back",
+     "correct": false,
+     "misconception": "M_RETURN_LOST"
+    }
+   ],
+   "explain": "A call is a detour, not a fork. Control moves to the callee, and on return it lands on the line immediately after the call."
+  },
+  {
+   "id": "r02",
+   "concept": "function_calls",
+   "difficulty": -0.9,
+   "stem": "Given `def add(a, b): return a + b`, what does the expression `add(x, y)` evaluate to?",
+   "options": [
+    {
+     "text": "A single value - whatever the return statement produced",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Nothing; you have to print inside the function to get a value",
+     "correct": false,
+     "misconception": "M_RETURN_LOST"
+    },
+    {
+     "text": "The function object itself",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Both a and b, returned together",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "A call expression is replaced by its return value at the call site. That is what makes `z = add(2,3)` meaningful."
+  },
+  {
+   "id": "r03",
+   "concept": "function_calls",
+   "difficulty": -0.4,
+   "stem": "A function `f(n)` calls `f(n-1)` but contains no return statement. What does `f(5)` evaluate to?",
+   "options": [
+    {
+     "text": "None - the recursion runs but no value ever comes back",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "The result of f(4)",
+     "correct": false,
+     "misconception": "M_RETURN_LOST"
+    },
+    {
+     "text": "An error, because recursion requires a return",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "5",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "The call happens, the work happens, and then the value is dropped on the floor. No return means the call evaluates to None."
+  },
+  {
+   "id": "r04",
+   "concept": "call_stack",
+   "difficulty": -0.6,
+   "stem": "`f(3)` calls `f(2)` which calls `f(1)`. How many frames are on the stack at the moment `f(1)` starts executing?",
+   "options": [
+    {
+     "text": "3 - one for each call that has not returned yet",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "1 - only the currently executing call matters",
+     "correct": false,
+     "misconception": "M_SHARED_VARS"
+    },
+    {
+     "text": "0 - recursion does not use the stack",
+     "correct": false,
+     "misconception": "M_DEPTH_FREE"
+    },
+    {
+     "text": "6 - one for each call and each return",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Frames accumulate on the way down. At the deepest point all three calls are still live, so all three frames exist."
+  },
+  {
+   "id": "r05",
+   "concept": "call_stack",
+   "difficulty": -0.2,
+   "stem": "Each call of `f(n)` has a local `total`. `f(3)` sets total=3, then calls `f(2)`, which sets total=2. When `f(2)` returns, what is `total` in the `f(3)` frame?",
+   "options": [
+    {
+     "text": "3 - each frame has its own total",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "2 - the most recent assignment wins",
+     "correct": false,
+     "misconception": "M_SHARED_VARS"
+    },
+    {
+     "text": "0 - locals are reset when a call returns",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "It depends on whether total was passed as an argument",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "This is the single most common recursion bug. The inner frame's total is a different variable, and it disappears when that frame is popped."
+  },
+  {
+   "id": "r06",
+   "concept": "call_stack",
+   "difficulty": 0.7,
+   "stem": "Why does `f(n) = f(n-1) + 1` with no base case crash with RecursionError instead of looping forever?",
+   "options": [
+    {
+     "text": "Each call pushes a frame, and the stack has a finite size, so it overflows",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Python detects the missing base case and stops it",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "n eventually becomes negative and Python rejects negative input",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Recursion uses no memory, so it hits a CPU limit instead",
+     "correct": false,
+     "misconception": "M_DEPTH_FREE"
+    }
+   ],
+   "explain": "The crash is a stack overflow, not a cleverness on the interpreter's part. That distinction matters because it tells you the fix is structural."
+  },
+  {
+   "id": "r07",
+   "concept": "base_case",
+   "difficulty": -1.0,
+   "stem": "In `def fact(n):` / `if n <= 1: return 1` / `return n * fact(n-1)` - which line makes termination possible?",
+   "options": [
+    {
+     "text": "`if n <= 1: return 1` - it returns without calling itself",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "`return n * fact(n-1)` - it calls itself with a smaller n",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "Both lines share the responsibility equally",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "Neither; this needs a loop to terminate",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Shrinking the input is necessary but not sufficient. Something has to stop the shrinking by returning."
+  },
+  {
+   "id": "r08",
+   "concept": "base_case",
+   "difficulty": 0.2,
+   "stem": "Consider `def count(n): if n == 0: return 0; return count(n-2)`. What happens when you call `count(5)`?",
+   "options": [
+    {
+     "text": "It never reaches 0, so it recurses until the stack overflows",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "It returns 0, because 5 is close enough to 0",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "It stops at n=1 because Python rounds down",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "It raises a TypeError on odd numbers",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "5, 3, 1, -1, -3 ... the base case is never hit. A base case only helps if the recursive step can actually reach it."
+  },
+  {
+   "id": "r09",
+   "concept": "base_case",
+   "difficulty": 0.9,
+   "stem": "A recursive function has a correct base case, but for some inputs the recursive call does not shrink the input. What is the symptom?",
+   "options": [
+    {
+     "text": "Infinite recursion for those inputs only - the base case is unreachable from them",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "It cannot happen; a base case guarantees termination",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "The base case is skipped but the loop still ends",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "Python raises a ValueError before it runs",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Correctness of the base case is a per-input property. You must show that every input path leads to it, which is the real content of a termination proof."
+  },
+  {
+   "id": "r10",
+   "concept": "recursive_case",
+   "difficulty": -0.7,
+   "stem": "In `def power(x, n): if n == 0: return 1; return x * power(x, n-1)`, what is the job of `x * power(x, n-1)`?",
+   "options": [
+    {
+     "text": "It trusts the smaller call to produce x^(n-1), then builds x^n from it",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "It loops n times multiplying x",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "It launches n calls in parallel",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "It returns the smaller answer unchanged",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "This is the leap of faith: assume the smaller call is correct, then do the one step that turns it into your answer."
+  },
+  {
+   "id": "r11",
+   "concept": "recursive_case",
+   "difficulty": 0.1,
+   "stem": "`def total(lst): return lst[0] + total(lst)` - why is the recursive case invalid?",
+   "options": [
+    {
+     "text": "It passes the same list, so the input never gets smaller",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "It adds lst[0] twice",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "It is missing a base case",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "Lists cannot be passed to recursive functions",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "The subproblem must be strictly smaller. `lst[1:]` would be a valid recursive step; `lst` is not."
+  },
+  {
+   "id": "r12",
+   "concept": "recursive_case",
+   "difficulty": 1.1,
+   "stem": "`def sum_to(n): if n == 0: return 0; return sum_to(n-1)` - the base case is fine. What is wrong?",
+   "options": [
+    {
+     "text": "n is never added, so it always returns 0",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Nothing is wrong; it returns the sum",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "It recurses infinitely",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "The base case returns the wrong type",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "The value comes back up the stack correctly, but every frame passes it along untouched. The combining step is missing."
+  },
+  {
+   "id": "r13",
+   "concept": "unwinding",
+   "difficulty": 0.4,
+   "stem": "`f(3)` calls `f(2)` calls `f(1)`, and each one prints `n` *after* its recursive call. What order prints?",
+   "options": [
+    {
+     "text": "1 2 3 - the innermost call finishes first",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "3 2 1 - the same order the calls were made",
+     "correct": false,
+     "misconception": "M_RETURN_ORDER"
+    },
+    {
+     "text": "3 2 1 then 1 2 3",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Only 1 - the outer prints are skipped",
+     "correct": false,
+     "misconception": "M_RETURN_LOST"
+    }
+   ],
+   "explain": "Code before the call runs on the way down; code after the call runs on the way up, which is reversed."
+  },
+  {
+   "id": "r14",
+   "concept": "unwinding",
+   "difficulty": 0.8,
+   "stem": "In `def f(n): if n == 0: return 0; f(n-1); return n` - what does `f(3)` return?",
+   "options": [
+    {
+     "text": "3 - the inner result is discarded, then n is returned",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "0 - the base case value bubbles all the way up",
+     "correct": false,
+     "misconception": "M_RETURN_LOST"
+    },
+    {
+     "text": "6 - the values are summed while unwinding",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Nothing, because the inner call returns first",
+     "correct": false,
+     "misconception": "M_RETURN_ORDER"
+    }
+   ],
+   "explain": "`f(n-1)` is called and its value is thrown away. Each frame returns its own n, so the outermost value wins."
+  },
+  {
+   "id": "r15",
+   "concept": "unwinding",
+   "difficulty": 1.3,
+   "stem": "Why does `return n + f(n-1)` give the right answer while `f(n-1); return n` does not?",
+   "options": [
+    {
+     "text": "Only the first hands the inner result back outward; the second discards it",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "The first is faster and finishes before unwinding",
+     "correct": false,
+     "misconception": "M_RETURN_ORDER"
+    },
+    {
+     "text": "The second is missing a base case",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    },
+    {
+     "text": "The second returns n before the inner call runs",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Unwinding is a relay, not a broadcast. Each frame must explicitly pass the baton to the frame that called it."
+  },
+  {
+   "id": "r16",
+   "concept": "recursion_tree",
+   "difficulty": 0.3,
+   "stem": "`fib(n)` calls both `fib(n-1)` and `fib(n-2)`. Roughly how many calls happen for `fib(5)`?",
+   "options": [
+    {
+     "text": "About 15 - the calls form a branching tree",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "About 5 - one per level of recursion",
+     "correct": false,
+     "misconception": "M_TREE_LINEAR"
+    },
+    {
+     "text": "About 10 - two per level",
+     "correct": false,
+     "misconception": "M_TREE_LINEAR"
+    },
+    {
+     "text": "Exactly 2",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "The tree branches, so the count is closer to phi^5 than to 5. Draw it and count the nodes."
+  },
+  {
+   "id": "r17",
+   "concept": "recursion_tree",
+   "difficulty": 0.9,
+   "stem": "A function makes 2 recursive calls per invocation and bottoms out at depth 10. Total calls are on the order of:",
+   "options": [
+    {
+     "text": "2^10 - the tree doubles at every level",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "20 - two calls times ten levels",
+     "correct": false,
+     "misconception": "M_TREE_LINEAR"
+    },
+    {
+     "text": "10 - depth is what matters",
+     "correct": false,
+     "misconception": "M_TREE_LINEAR"
+    },
+    {
+     "text": "100 - ten squared",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "1, 2, 4, 8 ... doubling per level is exponentiation. This is exactly why naive fib is unusable for large n."
+  },
+  {
+   "id": "r18",
+   "concept": "recursion_tree",
+   "difficulty": 1.4,
+   "stem": "Recursion depth is only 20, but the function makes 2 calls per level and takes 3 seconds. Why?",
+   "options": [
+    {
+     "text": "The tree has roughly a million nodes - depth is small but total work is exponential",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Deep recursion is always slow because the stack is large",
+     "correct": false,
+     "misconception": "M_TREE_LINEAR"
+    },
+    {
+     "text": "Python's recursion limit is being hit",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Two calls per level means 40 calls total",
+     "correct": false,
+     "misconception": "M_TREE_LINEAR"
+    }
+   ],
+   "explain": "Depth and total work are different quantities. This is the distinction that separates a fast recursion from a slow one."
+  },
+  {
+   "id": "r19",
+   "concept": "complexity",
+   "difficulty": 0.6,
+   "stem": "What is the space complexity of a recursion that goes n levels deep and allocates nothing extra?",
+   "options": [
+    {
+     "text": "O(n) - one frame per live call",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "O(1) - recursion adds no memory",
+     "correct": false,
+     "misconception": "M_DEPTH_FREE"
+    },
+    {
+     "text": "O(n^2) - frames are copied at each level",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "O(log n) - the stack halves each time",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Stack space is the cost recursion almost always charges, even when it is a model of elegance otherwise."
+  },
+  {
+   "id": "r20",
+   "concept": "complexity",
+   "difficulty": 1.0,
+   "stem": "Naive `fib(n)` is O(2^n) in time. What is its space complexity?",
+   "options": [
+    {
+     "text": "O(n) - only one root-to-leaf path is on the stack at a time",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "O(2^n) - the same as time, since every call allocates",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "O(1)",
+     "correct": false,
+     "misconception": "M_DEPTH_FREE"
+    },
+    {
+     "text": "O(n^2)",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Frames are popped as the tree is explored depth-first, so peak memory tracks depth, not node count. A common interview question for exactly this reason."
+  },
+  {
+   "id": "r21",
+   "concept": "complexity",
+   "difficulty": 1.5,
+   "stem": "A recursive `sum(lst)` is O(n) time and O(n) space, while a loop version is O(n) time and O(1) space. Why?",
+   "options": [
+    {
+     "text": "The recursive version keeps n frames alive; the loop keeps none",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "The recursive version copies the list at every call",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "They have identical space; recursion never costs extra memory",
+     "correct": false,
+     "misconception": "M_DEPTH_FREE"
+    },
+    {
+     "text": "The loop is faster because it uses the CPU cache",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "This is the honest trade-off. Recursion buys clarity with stack memory, and knowing that is what lets you choose deliberately."
+  },
+  {
+   "id": "r22",
+   "concept": "memoization",
+   "difficulty": 1.0,
+   "stem": "Memoized `fib(n)` drops from O(2^n) to O(n). What makes that possible?",
+   "options": [
+    {
+     "text": "The same subproblems recur many times, and the cache returns them instantly",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "The cache stores the whole call tree so it never recurses",
+     "correct": false,
+     "misconception": "M_MEMO_MAGIC"
+    },
+    {
+     "text": "Memoization removes the need for a base case",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "It runs the two branches in parallel",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "There are only n+1 distinct fib values but exponentially many paths to them. The cache collapses the paths into the values."
+  },
+  {
+   "id": "r23",
+   "concept": "memoization",
+   "difficulty": 1.3,
+   "stem": "You memoize a recursive function that sums a list by splitting it in half. Does it help?",
+   "options": [
+    {
+     "text": "Barely - every subproblem is unique, so the cache never hits",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Yes, it halves the runtime",
+     "correct": false,
+     "misconception": "M_MEMO_MAGIC"
+    },
+    {
+     "text": "Yes, it becomes O(1)",
+     "correct": false,
+     "misconception": "M_MEMO_MAGIC"
+    },
+    {
+     "text": "No, memoization never works on lists",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Overlapping subproblems are the precondition, not a bonus. Without repeats you have added a dict lookup to every call for nothing."
+  },
+  {
+   "id": "r24",
+   "concept": "memoization",
+   "difficulty": 1.6,
+   "stem": "For memoization to be correct and not just fast, what must hold?",
+   "options": [
+    {
+     "text": "The same arguments must always produce the same result - no dependence on outside mutable state",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "The arguments must be small integers",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "The function must be tail-recursive",
+     "correct": false,
+     "misconception": "M_TAIL_OPT"
+    },
+    {
+     "text": "The base case must be at 0",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Caching assumes referential transparency. If the function reads a global that changes, the cache will hand back stale answers."
+  },
+  {
+   "id": "r25",
+   "concept": "tail_recursion",
+   "difficulty": 1.2,
+   "stem": "Which of these is tail-recursive?",
+   "options": [
+    {
+     "text": "`def f(n, acc): return acc if n == 0 else f(n-1, acc+n)`",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "`def f(n): return 1 if n == 0 else n * f(n-1)`",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "`def f(n): return 0 if n == 0 else n + f(n-1)`",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "The last two are both tail-recursive",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "In the first, the recursive call's value is returned untouched. In the others, a multiplication or addition happens after the call returns, so the frame must survive."
+  },
+  {
+   "id": "r26",
+   "concept": "tail_recursion",
+   "difficulty": 1.5,
+   "stem": "Does Python optimise tail recursion?",
+   "options": [
+    {
+     "text": "No - Python has a recursion limit and performs no tail-call optimisation",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Yes, since Python 3.8",
+     "correct": false,
+     "misconception": "M_TAIL_OPT"
+    },
+    {
+     "text": "Yes, if you decorate the function with @tailcall",
+     "correct": false,
+     "misconception": "M_TAIL_OPT"
+    },
+    {
+     "text": "Only for integer arguments",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "This trips people up constantly. Writing a function in tail position does nothing for you in CPython; the stack still grows."
+  },
+  {
+   "id": "r27",
+   "concept": "tail_recursion",
+   "difficulty": 1.7,
+   "stem": "Why can a tail-recursive function theoretically run in constant stack space?",
+   "options": [
+    {
+     "text": "Nothing remains to be done after the call returns, so the caller's frame can be replaced",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Because tail recursion always has a smaller input",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Because the compiler rewrites it as a loop only when there is one argument",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Because tail calls skip the base case",
+     "correct": false,
+     "misconception": "M_NO_BASE"
+    }
+   ],
+   "explain": "The frame exists to remember what to do next. In tail position there is nothing to remember, so the frame is disposable."
+  }
+ ]
+}

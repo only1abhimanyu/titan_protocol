@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MasteryLoop — learn what you actually got wrong</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<!-- dunes art, reused by the landing panel and the auth panel -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0A0A0E"/><stop offset=".5" stop-color="#1A1A20"/><stop offset="1" stop-color="#141419"/></linearGradient>
+  <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D9D9DF"/><stop offset=".45" stop-color="#8A8A92"/><stop offset="1" stop-color="#1A1A1F"/></linearGradient>
+  <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#252529"/><stop offset="1" stop-color="#0C0C10"/></linearGradient>
+  <linearGradient id="fore" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55555C"/><stop offset="1" stop-color="#0A0A0D"/></linearGradient>
+  <filter id="blur"><feGaussianBlur stdDeviation="6"/></filter>
+  <symbol id="dunes" viewBox="0 0 600 750" preserveAspectRatio="xMidYMid slice">
+    <rect width="600" height="750" fill="#07070A"/>
+    <radialGradient id="orbg">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/>
+      <stop offset=".42" stop-color="#fff" stop-opacity=".10"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <circle cx="300" cy="310" r="250" fill="url(#orbg)" opacity=".55"/>
+    <g fill="none" stroke="#fff" stroke-opacity=".14">
+      <circle cx="300" cy="310" r="86"/><circle cx="300" cy="310" r="124"/>
+      <circle cx="300" cy="310" r="162"/><circle cx="300" cy="310" r="200"/>
+      <circle cx="300" cy="310" r="238"/><circle cx="300" cy="310" r="276"/>
+    </g>
+    <g fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.4">
+      <circle cx="300" cy="310" r="124" stroke-dasharray="3 12"/>
+      <circle cx="300" cy="310" r="238" stroke-dasharray="2 18"/>
+    </g>
+    <g fill="#fff">
+      <circle cx="300" cy="186" r="3" opacity=".85"/>
+      <circle cx="424" cy="310" r="2.2" opacity=".6"/>
+      <circle cx="300" cy="548" r="2.6" opacity=".7"/>
+      <circle cx="176" cy="310" r="2" opacity=".5"/>
+    </g>
+    <circle cx="300" cy="310" r="22" fill="#fff" opacity=".92"/>
+  </symbol>
+</defs></svg>
+
+<!-- ============================ LANDING ============================ -->
+<div id="landing" hidden>
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="#/">
+      <svg viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="8" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/><path d="M8 18V8l5 6 5-6v10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      MasteryLoop
+    </a>
+    <nav class="landing">
+      <a class="link" href="#how">How it works</a>
+      <a class="link" href="#/login">Log in</a>
+      <a class="btn light" href="#/signup">Get started</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <h1>Know exactly<br>what you got <b>wrong.</b></h1>
+      <p class="lede">MasteryLoop is a tutor that reads your answers, finds the wrong idea behind them,
+        traces it back to the concept that actually broke, and won't let you move on until you can
+        explain the right one.</p>
+      <div class="cta">
+        <a class="btn light" href="#/signup">Start learning free</a>
+        <a class="btn" href="#/login">Log in</a>
+      </div>
+      <p class="trust">Any subject you can paste a syllabus for. No card. Works offline.</p>
+    </div>
+    <div class="panel" role="img" aria-label="Desert dunes at dusk with a sample diagnosis">
+      <svg class="art" aria-hidden="true"><use href="#dunes"/></svg>
+      <div class="glassbox">
+        <small>Diagnosis · Recursion</small>
+        <div class="eq">"Recursion stops on its own"</div>
+        <div class="hintbox"><b>Root cause: the base case.</b> Two of your answers trace back here.</div>
+      </div>
+      <div class="cap">
+        <h2>The gap,<br>not the score.</h2>
+        <p>Diagnosis, not a percentage</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="land" id="how">
+    <div class="head"><h2>A tutor that finds the broken idea.</h2>
+      <p>Three things every session does that a quiz app cannot.</p></div>
+    <div class="cols">
+      <div class="col"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+        <h3>Names the wrong idea</h3>
+        <p>Every distractor is tagged with the misconception it reveals. Two of them agree and it tells you the sentence in your head that is wrong.</p></div>
+      <div class="col"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M6 16v-5M11 16V6M16 16v-8"/></svg></div>
+        <h3>Traces the gap upstream</h3>
+        <p>A failure pushes belief down the prerequisite chain, so a gap in the call stack shows up when you miss a question about recursion.</p></div>
+      <div class="col"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h6M8 11h6"/></svg></div>
+        <h3>Makes you explain it</h3>
+        <p>A correct answer you cannot explain does not move your mastery. You write it in your own words and it is graded against a rubric.</p></div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div><strong>14</strong><span>named misconceptions, each with its repair</span></div>
+    <div><strong>0</strong><span>XP for guessing — only mastery movement pays</span></div>
+    <div><strong>2×</strong><span>stronger evidence from an explanation than a guess</span></div>
+  </div>
+
+  <section class="land" style="text-align:center">
+    <h2 style="font-size:clamp(30px,4.6vw,52px);max-width:16em;margin:0 auto">Paste your syllabus. Get a tutor for it.</h2>
+    <div class="cta" style="justify-content:center;margin-top:26px">
+      <a class="btn light" href="#/signup">Create an account</a>
+    </div>
+  </section>
+
+  <footer class="land"><span>MasteryLoop · Titan Protocol</span><span>Code E Fiesta 2026</span></footer>
+</div>
+</div>
+
+<!-- ============================== AUTH ============================== -->
+<div id="auth" hidden>
+  <div class="wrap">
+    <header class="top">
+      <a class="logo" href="#/">
+        <svg viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="8" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/><path d="M8 18V8l5 6 5-6v10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        MasteryLoop
+      </a>
+      <nav class="landing"><a class="link" href="#/">Back to home</a></nav>
+    </header>
+    <div class="auth">
+      <form class="form" id="authForm" novalidate>
+        <small class="k" id="authKicker">Log in to your account</small>
+        <h1 id="authTitle">Welcome back!</h1>
+        <p class="sub" id="authSub">Enter your email and password.</p>
+        <div id="nameWrap" hidden>
+          <label for="aName">Name</label>
+          <div class="field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            <input id="aName" type="text" placeholder="Your name" autocomplete="name">
+          </div>
+        </div>
+        <label for="aEmail">Email address</label>
+        <div class="field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg>
+          <input id="aEmail" type="email" placeholder="you@school.edu" autocomplete="email">
+        </div>
+        <label for="aPw">Password</label>
+        <div class="field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <input id="aPw" type="password" placeholder="At least 8 characters" autocomplete="current-password">
+          <button class="pwtoggle" type="button" id="pwToggle">Show</button>
+        </div>
+        <p class="msg" id="authMsg" role="status"></p>
+        <button class="btn dark block" type="submit" id="authGo" style="margin-top:18px">Sign in</button>
+        <p class="switch" id="authSwitch"></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== APP ============================== -->
+<div class="shell" id="shell" hidden>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <svg viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="8" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2"/><path d="M8 18V8l5 6 5-6v10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>MasteryLoop</span>
+      <button class="collapse-btn" id="collapse" aria-label="Collapse sidebar">
+        <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+    </div>
+    <nav class="sb-nav">
+      <a class="sb-item" href="#/app" data-nav="app">
+        <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span class="lbl">Home</span></a>
+      <a class="sb-item" href="#/learn" data-nav="learn">
+        <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h6M8 11h6"/></svg><span class="lbl">Learn</span></a>
+      <a class="sb-item" href="#/cards" data-nav="cards">
+        <svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg><span class="lbl">Flashcards</span><span class="badge" id="dueBadge" hidden>0</span></a>
+      <a class="sb-item" href="#/profile" data-nav="profile">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="lbl">Profile</span></a>
+    </nav>
+    <div class="sb-foot">
+      <a class="sb-item" href="#/settings" data-nav="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+        <span class="lbl">Settings</span></a>
+      <a class="sb-user" href="#/profile" id="sbUser">
+        <div class="avatar" id="avatar">?</div>
+        <div class="who"><b id="sbName">—</b><small id="sbLevel">Level 1</small></div>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- HOME -->
+    <section id="view-app" hidden>
+      <div class="pagehead">
+        <div><div class="kicker">Today</div><h1 id="greet">Hello.</h1></div>
+        <div class="pills">
+          <span class="pill" id="pillStreak">0-day streak</span>
+          <span class="pill" id="pillLevel">Level 1</span>
+          <span class="pill" id="pillXp">0 XP</span>
+        </div>
+      </div>
+      <div class="grid2">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card2">
+            <div class="tag">Continue where you left off</div>
+            <div id="continueBox"><div class="empty">No session yet. Pick a topic to begin.</div></div>
+          </div>
+          <div class="card2">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <h3 style="font-size:20px;font-weight:600">Your topics</h3>
+              <button class="btn sm light" id="openSyl">+ Add syllabus</button>
+            </div>
+            <div id="topicList"></div>
+          </div>
+          <div class="card2">
+            <div class="sec-label">Flashcards due</div>
+            <div style="display:flex;align-items:center;gap:14px">
+              <div class="stat"><div class="v" id="dueNum">0</div></div>
+              <a class="btn sm light" href="#/cards">Review</a>
+            </div>
+            <div class="small muted" style="margin-top:8px" id="cardMeta">No deck yet.</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card2">
+            <div class="ring-row">
+              <svg class="ring-gauge" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="rg-track" cx="60" cy="60" r="50"/>
+                <circle class="rg-fill" id="rgFill" cx="60" cy="60" r="50"
+                        transform="rotate(-90 60 60)"/>
+              </svg>
+              <div class="ring-hole">
+                <div class="ring-num" id="rgNum">0%</div>
+                <div class="ring-cap">readiness</div>
+              </div>
+              <div class="ring-meta">
+                <div class="sec-label" style="margin:0 0 4px">Level</div>
+                <div class="lv-line"><span class="lv-big" id="lvNum">1</span>
+                  <span class="muted" id="lvTitle">Seed</span></div>
+                <div class="bar-track"><div class="bar-fill" id="lvBar" style="width:0%"></div></div>
+                <div class="small muted" id="lvNext" style="margin-top:7px"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card2">
+            <div class="sec-label">Today’s goals</div>
+            <div id="questList"></div>
+            <div class="small muted" id="questNote" style="margin-top:10px"></div>
+          </div>
+          <div class="card2">
+            <div class="sec-label">Achievements</div>
+            <div class="ach" id="achList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEARN -->
+    <section id="view-learn" hidden>
+      <div class="pagehead">
+        <div><div class="kicker">Adaptive session</div><h1 id="learnTitle">Learn</h1></div>
+        <div class="pills">
+          <span class="pill" id="pillReadiness">—</span>
+          <span class="pill" id="pillMastered">—</span>
+          <span class="pill" id="pillXp2">—</span>
+        </div>
+      </div>
+      <div id="learnPicker" hidden>
+        <div class="card2"><div class="sec-label">Choose a topic</div><div id="learnTopics"></div></div>
+      </div>
+      <div class="tutor" id="learnStage" hidden>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card2" id="stepCard"></div>
+          <div class="card2 tight">
+            <div class="sec-label">Engine trace</div>
+            <div class="trace" id="trace"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card2">
+            <div class="sec-label">Knowledge graph</div>
+            <div class="graphwrap"><svg id="graph" preserveAspectRatio="xMidYMid meet"></svg></div>
+            <div class="legend">
+              <span><i style="background:rgba(255,255,255,.16)"></i>untested</span>
+              <span><i style="background:rgba(255,255,255,.05);border:1px solid #FFF"></i>gap</span>
+              <span><i style="background:rgba(255,255,255,.5)"></i>developing</span>
+              <span><i style="background:#FFF"></i>mastered</span>
+            </div>
+          </div>
+          <div class="card2">
+            <div class="sec-label">Diagnosis</div>
+            <div id="dx"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FLASHCARDS -->
+    <section id="view-cards" hidden>
+      <div class="pagehead">
+        <div><div class="kicker">Spaced repetition</div><h1>Flashcards</h1></div>
+        <div class="pills"><span class="pill" id="cardPill">—</span></div>
+      </div>
+      <div class="grid2">
+        <div class="card2" id="cardStage"><div class="empty">Pick a topic to generate a deck.</div></div>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card2">
+            <div class="sec-label">Generate a deck</div>
+            <p class="small muted" style="margin:0 0 12px">Cards are built from the misconceptions your
+              session actually diagnosed, not from generic definitions.</p>
+            <div id="deckTopics"></div>
+          </div>
+          <div class="card2">
+            <div class="sec-label">Deck</div>
+            <div class="kv"><span>Total cards</span><span id="stTotal">0</span></div>
+            <div class="kv"><span>Due now</span><span id="stDue">0</span></div>
+            <div class="kv"><span>Reviews</span><span id="stReps">0</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="view-profile" hidden>
+      <div class="pagehead"><div><div class="kicker">You</div><h1 id="profName">Profile</h1></div>
+        <div class="pills"><span class="pill" id="profLevel">—</span><span class="pill" id="profStreak">—</span></div></div>
+      <div class="grid2">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card2">
+            <div class="sec-label">XP ledger</div>
+            <p class="small muted" style="margin:0 0 10px">Every point traces to a mastery gain. Nothing here was earned by answering questions.</p>
+            <div id="xpBreak"></div>
+          </div>
+          <div class="card2">
+            <div class="sec-label">Recent events</div>
+            <div class="trace" id="xpRecent" style="max-height:260px"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card2"><div class="sec-label">Achievements</div><div class="ach" id="achList2" style="grid-template-columns:1fr"></div></div>
+          <div class="card2">
+            <div class="sec-label">Account</div>
+            <div class="kv"><span>Email</span><span id="profEmail">—</span></div>
+            <div class="kv"><span>API key</span><span id="profKey">—</span></div>
+            <div class="kv"><span>Model</span><span id="profModel">—</span></div>
+            <div style="margin-top:14px"><button class="btn sm ghost" id="logoutBtn">Log out</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" hidden>
+      <div class="pagehead"><div><div class="kicker">Configuration</div><h1>Settings</h1></div></div>
+      <div class="grid2">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card2">
+            <div class="sec-label">Your API key</div>
+            <p class="small muted" style="margin:0 0 12px">Optional. The project ships with a default key.
+              Add your own to use your own quota — it is encrypted before it touches the database and is
+              never sent back to the browser.</p>
+            <div id="keyState"></div>
+            <div class="field" style="margin-top:12px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/><path d="M10.5 12H2m3 0v3m3-3v3"/></svg>
+              <input id="keyInput" type="password" placeholder="gsk_... · AIza... · sk-..." autocomplete="off">
+            </div>
+            <div class="actions">
+              <button class="btn" id="keySave">Save key</button>
+              <button class="btn ghost" id="keyTest">Test</button>
+              <button class="btn danger" id="keyClear">Remove</button>
+            </div>
+            <p class="msg" id="keyMsg"></p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card2">
+            <div class="sec-label">Status</div>
+            <div class="kv"><span>Model in use</span><span id="setModel">—</span></div>
+            <div class="kv"><span>Using your key</span><span id="setOwn">—</span></div>
+            <div class="kv"><span>Saved key</span><span id="setMasked">—</span></div>
+            <div class="kv"><span>Encryption</span><span id="setEnc">—</span></div>
+          </div>
+          <div class="card2">
+            <div class="note">
+              <b>Honest note.</b> Stored keys are encrypted with Fernet under a server-side secret.
+              That is real encryption at rest, but it is not a secrets manager — there is no key
+              rotation and no audit log. Set <code>APP_SECRET</code> in the environment for anything
+              beyond a demo.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- celebration layer -->
+<div id="levelup" class="levelup" hidden>
+  <div class="lu-glow"></div>
+  <div class="lu-card">
+    <div class="lu-kicker">Level up</div>
+    <div class="lu-num" id="luNum">2</div>
+    <div class="lu-title" id="luTitle">Sprout</div>
+    <p class="lu-sub" id="luSub">Your mastery moved. That is the only thing that pays.</p>
+  </div>
+</div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
+
+<!-- add-syllabus modal: one textbox, PDF drop -->
+<div id="sylModal" class="modal-wrap" hidden>
+  <div class="modal-card">
+    <div class="sec-label">New topic</div>
+    <h2>Paste your syllabus</h2>
+    <p class="small muted" style="margin:0">Paste the text, or drop a PDF into the box.
+      A model builds the concept graph, the misconceptions and the question bank for it.</p>
+    <div class="drop" id="dropZone">
+      <textarea id="sylText" placeholder="Paste your syllabus here — chapter names, topics, or the whole thing.&#10;&#10;Or drag a PDF into this box."></textarea>
+      <div class="drop-hint" id="dropHint">PDF · max 12 MB</div>
+    </div>
+    <div class="actions" style="margin-top:16px">
+      <button class="btn light" id="sylGo">Generate topic</button>
+      <button class="btn ghost" id="sylClose">Cancel</button>
+      <span class="small muted" id="sylMsg"></span>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

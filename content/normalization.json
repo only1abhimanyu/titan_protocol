@@ -1,0 +1,735 @@
+{
+ "id": "normalization",
+ "title": "DBMS Normalization",
+ "subject": "Database Management Systems",
+ "blurb": "Follow the normal forms as a chain of dependency repairs, from atomic values up to BCNF.",
+ "concepts": [
+  {
+   "id": "functional_dependency",
+   "name": "Functional Dependencies",
+   "prereqs": [],
+   "summary": "X -> Y means that any two rows agreeing on X must agree on Y. It is a statement about the data, not about the schema.",
+   "analogy": "A dependency is a rule of the world: a PIN determines exactly one account, so PIN -> Account.",
+   "key_ideas": [
+    "X -> Y holds when equal X implies equal Y",
+    "an FD is a property of the data, not the table layout",
+    "unnecessary FDs are the root cause of redundancy"
+   ],
+   "worked": [
+    "look at two rows with the same StudentID",
+    "if both rows always carry the same Name, then StudentID -> Name holds",
+    "ask the reverse: can two rows share a Name but have different StudentIDs? Yes - so Name -/-> StudentID",
+    "the arrow direction is the whole meaning; it is not symmetric"
+   ]
+  },
+  {
+   "id": "candidate_key",
+   "name": "Keys: Superkey vs Candidate Key",
+   "prereqs": [
+    "functional_dependency"
+   ],
+   "summary": "A superkey uniquely identifies a row. A candidate key is a minimal superkey: drop any attribute and it stops being unique.",
+   "analogy": "A full address identifies a house; the postcode alone does not. The full address is minimal only if no part can be dropped.",
+   "key_ideas": [
+    "a superkey determines all attributes",
+    "a candidate key is a minimal superkey",
+    "a composite key has more than one attribute"
+   ],
+   "worked": [
+    "start with every attribute: {A, B, C} - that is a superkey",
+    "test minimality: is {A, B} still unique? yes -> drop C",
+    "test again: is {A} still unique? yes -> drop B",
+    "{A} is now minimal, so it is the candidate key"
+   ]
+  },
+  {
+   "id": "first_normal_form",
+   "name": "First Normal Form (1NF)",
+   "prereqs": [
+    "candidate_key"
+   ],
+   "summary": "Every attribute holds a single atomic value, and there are no repeating groups. 1NF says nothing about redundancy.",
+   "analogy": "One item per box on a form. Not 'pens, notebooks' squeezed into a single field.",
+   "key_ideas": [
+    "each cell holds one atomic value",
+    "no repeating groups or nested tables",
+    "1NF does not address redundancy"
+   ],
+   "worked": [
+    "bad: Orders(101, 'pen, notebook')",
+    "the Items cell holds two values in one field",
+    "split it: Orders(101, 'pen'), Orders(101, 'notebook')",
+    "each cell now holds exactly one atomic value - that is 1NF"
+   ]
+  },
+  {
+   "id": "partial_dependency",
+   "name": "Partial Dependency",
+   "prereqs": [
+    "first_normal_form"
+   ],
+   "summary": "A non-key attribute depends on only part of a composite key. It can only exist when the key has more than one attribute.",
+   "analogy": "A recipe filed under both cuisine and dish, but the spice mix depends only on the cuisine - half the key is enough.",
+   "key_ideas": [
+    "requires a composite key",
+    "the attribute depends on a proper subset of the key",
+    "single-column keys cannot have partial dependencies"
+   ],
+   "worked": [
+    "key is (StudentID, CourseID)",
+    "StudentName depends on StudentID alone - half the key",
+    "Grade depends on both StudentID and CourseID - the whole key",
+    "so StudentName is partially dependent; Grade is fully dependent"
+   ]
+  },
+  {
+   "id": "second_normal_form",
+   "name": "Second Normal Form (2NF)",
+   "prereqs": [
+    "partial_dependency"
+   ],
+   "summary": "In 1NF and every non-key attribute depends on the whole key, not part of it.",
+   "analogy": "No half-dependencies. Every attribute has to justify both halves of the key.",
+   "key_ideas": [
+    "1NF plus no partial dependencies",
+    "only relevant when the key is composite",
+    "fix is to split the partially dependent attributes into their own table"
+   ],
+   "worked": [
+    "start from the 1NF table Enrollment(StudentID, CourseID, StudentName, Grade)",
+    "spot the partial dependency: StudentID -> StudentName",
+    "split it out: Student(StudentID, StudentName) and Enrollment(StudentID, CourseID, Grade)",
+    "verify losslessness: joining on StudentID reproduces the original rows exactly"
+   ]
+  },
+  {
+   "id": "transitive_dependency",
+   "name": "Transitive Dependency",
+   "prereqs": [
+    "second_normal_form"
+   ],
+   "summary": "A non-key attribute depends on another non-key attribute, which in turn depends on the key: key -> A -> B.",
+   "analogy": "You know the department name because you know the department id, not because you know the employee.",
+   "key_ideas": [
+    "key -> non-key -> non-key",
+    "the intermediate attribute is not a candidate key",
+    "this is what 3NF removes"
+   ],
+   "worked": [
+    "EmpID -> DeptID (the employee belongs to a department)",
+    "DeptID -> DeptName (a department has one name)",
+    "therefore EmpID -> DeptName, but only through DeptID",
+    "DeptName depends on the key indirectly, via a non-key attribute - that is transitive"
+   ]
+  },
+  {
+   "id": "third_normal_form",
+   "name": "Third Normal Form (3NF)",
+   "prereqs": [
+    "transitive_dependency"
+   ],
+   "summary": "In 2NF with no transitive dependencies: every non-key attribute depends directly on the key and nothing else.",
+   "analogy": "Every fact in the table is about the key, and only about the key.",
+   "key_ideas": [
+    "2NF plus no transitive dependencies",
+    "fix is to move the transitively dependent pair into a new table",
+    "3NF still permits some redundancy"
+   ],
+   "worked": [
+    "start from Employee(EmpID, DeptID, DeptName) in 2NF",
+    "spot the transitive chain EmpID -> DeptID -> DeptName",
+    "split: Employee(EmpID, DeptID) and Department(DeptID, DeptName)",
+    "now every non-key attribute depends directly on its own table's key - that is 3NF"
+   ]
+  },
+  {
+   "id": "bcnf",
+   "name": "Boyce-Codd Normal Form (BCNF)",
+   "prereqs": [
+    "third_normal_form"
+   ],
+   "summary": "Every determinant is a candidate key. Stricter than 3NF, and the price is that dependency preservation can be lost.",
+   "analogy": "Nobody gets to be a boss unless they are also on the list of legitimate keys.",
+   "key_ideas": [
+    "every determinant must be a candidate key",
+    "BCNF implies 3NF but not the reverse",
+    "decomposition is lossless but may not preserve all dependencies"
+   ],
+   "worked": [
+    "list the FDs: Student,Subject -> Teacher and Teacher -> Subject",
+    "list the candidate keys: (Student,Subject) and (Student,Teacher)",
+    "check every determinant: Teacher -> Subject has Teacher, which is not a candidate key",
+    "so the table is 3NF but not BCNF; decompose on Teacher",
+    "result: (Student,Teacher) and (Teacher,Subject) - lossless, and now every determinant is a key"
+   ]
+  }
+ ],
+ "misconceptions": [
+  {
+   "id": "M_NF_ORDER",
+   "name": "You can jump straight to 3NF",
+   "statement": "3NF is the strictest of the classic forms, so checking it automatically covers 1NF and 2NF.",
+   "why": "The normal forms are cumulative conditions, not a ladder you can skip. A table can satisfy a 3NF-style rule while still holding multi-valued cells, because 1NF was never checked.",
+   "repair": "Walk the chain in order. Each form presupposes the one before it."
+  },
+  {
+   "id": "M_PARTIAL_TRANS",
+   "name": "Partial and transitive dependencies are the same thing",
+   "statement": "Both are dependencies you have to remove, so the distinction does not matter in practice.",
+   "why": "Partial means depending on part of a composite key (a 2NF problem). Transitive means depending on a non-key attribute (a 3NF problem). They have different fixes and different symptoms.",
+   "repair": "Ask what the attribute depends on. Part of the key -> partial. Another non-key attribute -> transitive."
+  },
+  {
+   "id": "M_KEY_CONFUSION",
+   "name": "Any unique column is a candidate key",
+   "statement": "If a column has no duplicates it is a key, and a superkey and candidate key are the same idea.",
+   "why": "Uniqueness makes it a superkey. Minimality makes it a candidate key. A composite superkey is not a candidate key if one of its attributes is already unique on its own.",
+   "repair": "Test minimality explicitly: remove each attribute in turn and check whether uniqueness survives."
+  },
+  {
+   "id": "M_3NF_ALL",
+   "name": "3NF removes all redundancy",
+   "statement": "Once a table is in 3NF there are no anomalies left.",
+   "why": "3NF permits anomalies when a non-key attribute determines another attribute but is not itself a candidate key. That is precisely the gap BCNF closes.",
+   "repair": "Look for any determinant that is not a candidate key. If one exists, you are at 3NF but not BCNF."
+  },
+  {
+   "id": "M_LOSSLESS",
+   "name": "Any normalized decomposition is safe",
+   "statement": "If you split the table to remove a dependency, the result is automatically correct.",
+   "why": "A decomposition must be lossless: joining the pieces back must reproduce exactly the original rows, no more and no fewer. It should also preserve dependencies, or you cannot enforce them without joining.",
+   "repair": "Always verify losslessness by checking that the shared attribute of the two pieces is a key of at least one of them."
+  },
+  {
+   "id": "M_ATOMIC",
+   "name": "Comma-separated values are atomic enough",
+   "statement": "A single cell containing 'pen, notebook' is one value, so the column is atomic.",
+   "why": "A cell holding a list is a repeating group. It is not atomic, it cannot be indexed or constrained per element, and querying it means string surgery.",
+   "repair": "If you would ever need to split the cell to answer a query, it is not atomic."
+  }
+ ],
+ "items": [
+  {
+   "id": "n01",
+   "concept": "functional_dependency",
+   "difficulty": -1.0,
+   "stem": "What does `StudentID -> Name` assert?",
+   "options": [
+    {
+     "text": "Any two rows with the same StudentID must have the same Name",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Any two rows with the same Name must have the same StudentID",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "StudentID and Name are the same column",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "A Name may appear only once in the table",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "The arrow is one-directional. It constrains rows that agree on the left, and says nothing about rows that agree on the right."
+  },
+  {
+   "id": "n02",
+   "concept": "functional_dependency",
+   "difficulty": -0.3,
+   "stem": "In `Enrollment(StudentID, CourseID, StudentName)`, which dependency causes redundancy?",
+   "options": [
+    {
+     "text": "StudentID -> StudentName, so the name repeats for every course the student takes",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "CourseID -> CourseID",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "(StudentID, CourseID) -> Grade",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "None - dependencies never cause redundancy",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Redundancy comes from a dependency whose determinant is not a key. The name is stored once per enrolment when it only needs storing once per student."
+  },
+  {
+   "id": "n03",
+   "concept": "candidate_key",
+   "difficulty": -0.5,
+   "stem": "What distinguishes a candidate key from a superkey?",
+   "options": [
+    {
+     "text": "A candidate key is minimal - removing any attribute destroys uniqueness",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "A candidate key must be a single column",
+     "correct": false,
+     "misconception": "M_KEY_CONFUSION"
+    },
+    {
+     "text": "A superkey is always smaller than a candidate key",
+     "correct": false,
+     "misconception": "M_KEY_CONFUSION"
+    },
+    {
+     "text": "Nothing; the terms are synonyms",
+     "correct": false,
+     "misconception": "M_KEY_CONFUSION"
+    }
+   ],
+   "explain": "Every candidate key is a superkey, but not the reverse. Minimality is the whole distinction."
+  },
+  {
+   "id": "n04",
+   "concept": "candidate_key",
+   "difficulty": 0.4,
+   "stem": "In `R(A, B, C)` with FDs `A -> B` and `A -> C`, what are the candidate keys?",
+   "options": [
+    {
+     "text": "Just {A}",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "{A, B} and {A, C}",
+     "correct": false,
+     "misconception": "M_KEY_CONFUSION"
+    },
+    {
+     "text": "{A, B, C}",
+     "correct": false,
+     "misconception": "M_KEY_CONFUSION"
+    },
+    {
+     "text": "{B, C}",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "A alone determines everything, so adding anything to it makes the set non-minimal. Only {A} is a candidate key."
+  },
+  {
+   "id": "n05",
+   "concept": "first_normal_form",
+   "difficulty": -0.9,
+   "stem": "Which table violates 1NF?",
+   "options": [
+    {
+     "text": "Orders(OrderID, Items) where Items holds 'pen, notebook'",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Orders(OrderID, ItemName) with one row per item",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Orders(OrderID, CustomerID)",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Orders(OrderID, Total)",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "A list inside a cell is a repeating group. One row per item is the 1NF shape."
+  },
+  {
+   "id": "n06",
+   "concept": "first_normal_form",
+   "difficulty": 0.2,
+   "stem": "Is 1NF about eliminating redundancy?",
+   "options": [
+    {
+     "text": "No - it is about atomic values and no repeating groups; redundancy is addressed later",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Yes, 1NF removes all duplicate data",
+     "correct": false,
+     "misconception": "M_ATOMIC"
+    },
+    {
+     "text": "Yes, 1NF requires every column to be a key",
+     "correct": false,
+     "misconception": "M_KEY_CONFUSION"
+    },
+    {
+     "text": "1NF only applies to numeric columns",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "This is the most common misconception about 1NF. Atomicity is a structural property; redundancy is a dependency property."
+  },
+  {
+   "id": "n07",
+   "concept": "partial_dependency",
+   "difficulty": 0.1,
+   "stem": "`Enrollment(StudentID, CourseID, StudentName, Grade)` with key (StudentID, CourseID). Which is a partial dependency?",
+   "options": [
+    {
+     "text": "StudentID -> StudentName, since it depends on only part of the key",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "(StudentID, CourseID) -> Grade, since it needs the whole key",
+     "correct": false,
+     "misconception": "M_PARTIAL_TRANS"
+    },
+    {
+     "text": "StudentName -> Grade",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "There is none in this table",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Depending on the whole key is exactly what you want. Depending on half of it is the defect."
+  },
+  {
+   "id": "n08",
+   "concept": "partial_dependency",
+   "difficulty": 0.7,
+   "stem": "Why can a table with a single-column primary key never have a partial dependency?",
+   "options": [
+    {
+     "text": "A partial dependency needs a composite key to be partial against",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Single-column keys are automatically in 2NF",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Partial dependencies only occur with foreign keys",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "It can - any FD on a small key counts as partial",
+     "correct": false,
+     "misconception": "M_PARTIAL_TRANS"
+    }
+   ],
+   "explain": "There is no proper non-empty subset of a single attribute, so there is nothing for the dependency to be partial to."
+  },
+  {
+   "id": "n09",
+   "concept": "second_normal_form",
+   "difficulty": 0.5,
+   "stem": "2NF requires:",
+   "options": [
+    {
+     "text": "1NF plus no partial dependency on part of a composite key",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "1NF plus no transitive dependency",
+     "correct": false,
+     "misconception": "M_PARTIAL_TRANS"
+    },
+    {
+     "text": "Only atomic values",
+     "correct": false,
+     "misconception": "M_NF_ORDER"
+    },
+    {
+     "text": "BCNF",
+     "correct": false,
+     "misconception": "M_NF_ORDER"
+    }
+   ],
+   "explain": "2NF is the partial-dependency rule. Transitive dependencies are 3NF's business."
+  },
+  {
+   "id": "n10",
+   "concept": "second_normal_form",
+   "difficulty": 1.0,
+   "stem": "After decomposing a table to remove a partial dependency, what else must you verify?",
+   "options": [
+    {
+     "text": "That the decomposition is lossless and preserves dependencies",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "That the new tables have more rows than before",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Nothing - 2NF guarantees correctness",
+     "correct": false,
+     "misconception": "M_LOSSLESS"
+    },
+    {
+     "text": "That every new table has a surrogate key",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "Normalization is not finished when the anomaly disappears. You must be able to rebuild the original relation by joining."
+  },
+  {
+   "id": "n11",
+   "concept": "transitive_dependency",
+   "difficulty": 0.8,
+   "stem": "`Employee(EmpID, DeptID, DeptName)` with `EmpID -> DeptID -> DeptName`. How does DeptName relate to EmpID?",
+   "options": [
+    {
+     "text": "Transitively dependent on EmpID, through DeptID",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Partially dependent on EmpID",
+     "correct": false,
+     "misconception": "M_PARTIAL_TRANS"
+    },
+    {
+     "text": "Fully dependent on EmpID",
+     "correct": false,
+     "misconception": "M_PARTIAL_TRANS"
+    },
+    {
+     "text": "Independent of EmpID",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "The dependency path has a non-key hop in the middle. That hop is what makes it transitive rather than direct."
+  },
+  {
+   "id": "n12",
+   "concept": "transitive_dependency",
+   "difficulty": 1.2,
+   "stem": "How do you remove that transitive dependency?",
+   "options": [
+    {
+     "text": "Move DeptID and DeptName into a separate Department table",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Delete the DeptName column",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Make (EmpID, DeptID) the composite primary key",
+     "correct": false,
+     "misconception": "M_PARTIAL_TRANS"
+    },
+    {
+     "text": "Copy DeptName into every row for faster reads",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "The fix relocates the dependency, it does not delete information. DeptName belongs with DeptID, not with the employee."
+  },
+  {
+   "id": "n13",
+   "concept": "third_normal_form",
+   "difficulty": 0.9,
+   "stem": "3NF requires:",
+   "options": [
+    {
+     "text": "2NF plus no transitive dependency on a non-key attribute",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "2NF plus atomic values",
+     "correct": false,
+     "misconception": "M_NF_ORDER"
+    },
+    {
+     "text": "No functional dependencies at all",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "That every determinant is a candidate key",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "The last option is the definition of BCNF, which is the trap in this question. 3NF is the weaker condition."
+  },
+  {
+   "id": "n14",
+   "concept": "third_normal_form",
+   "difficulty": 1.4,
+   "stem": "Can a table in 3NF still contain redundancy?",
+   "options": [
+    {
+     "text": "Yes - when a non-key attribute determines another attribute",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "No - 3NF removes all redundancy",
+     "correct": false,
+     "misconception": "M_3NF_ALL"
+    },
+    {
+     "text": "Only if it has no primary key",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Only for numeric columns",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "This is the exact gap BCNF exists to close. 3NF permits a determinant that is not a candidate key."
+  },
+  {
+   "id": "n15",
+   "concept": "bcnf",
+   "difficulty": 1.5,
+   "stem": "BCNF is stricter than 3NF because:",
+   "options": [
+    {
+     "text": "Every determinant must be a candidate key",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "It forbids composite keys",
+     "correct": false,
+     "misconception": "M_KEY_CONFUSION"
+    },
+    {
+     "text": "It requires 4NF to be checked first",
+     "correct": false,
+     "misconception": "M_NF_ORDER"
+    },
+    {
+     "text": "It permits transitive dependencies",
+     "correct": false,
+     "misconception": "M_PARTIAL_TRANS"
+    }
+   ],
+   "explain": "3NF only restricts dependencies whose right-hand side is a non-key attribute. BCNF restricts every determinant, key or not."
+  },
+  {
+   "id": "n16",
+   "concept": "bcnf",
+   "difficulty": 1.7,
+   "stem": "`Teach(Student, Subject, Teacher)` where each Subject has exactly one Teacher and each Student takes one Subject at a time. Which form does it violate?",
+   "options": [
+    {
+     "text": "BCNF - Teacher -> Subject, but Teacher is not a candidate key",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "1NF - the values are not atomic",
+     "correct": false,
+     "misconception": "M_ATOMIC"
+    },
+    {
+     "text": "2NF - there is a partial dependency",
+     "correct": false,
+     "misconception": "M_PARTIAL_TRANS"
+    },
+    {
+     "text": "Nothing, it is already in BCNF",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "The candidate keys are (Student, Subject) and (Student, Teacher). Teacher determines Subject but is not a key, which is precisely the BCNF violation."
+  },
+  {
+   "id": "n17",
+   "concept": "bcnf",
+   "difficulty": 1.1,
+   "stem": "Decomposing into BCNF always guarantees:",
+   "options": [
+    {
+     "text": "Losslessness, but not necessarily dependency preservation",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "Both losslessness and dependency preservation",
+     "correct": false,
+     "misconception": "M_LOSSLESS"
+    },
+    {
+     "text": "Neither",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Better query performance",
+     "correct": false,
+     "misconception": null
+    }
+   ],
+   "explain": "This is the honest cost of BCNF, and a favourite exam question. Sometimes you must accept 3NF to keep dependencies enforceable."
+  },
+  {
+   "id": "n18",
+   "concept": "bcnf",
+   "difficulty": 0.0,
+   "stem": "What is the usual trade-off when you normalize a table into 3NF?",
+   "options": [
+    {
+     "text": "Fewer anomalies, but more joins to reassemble the data",
+     "correct": true,
+     "misconception": null
+    },
+    {
+     "text": "More redundancy but fewer joins",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "Both writes and reads get slower",
+     "correct": false,
+     "misconception": null
+    },
+    {
+     "text": "No trade-off - normalization is free",
+     "correct": false,
+     "misconception": "M_3NF_ALL"
+    }
+   ],
+   "explain": "Normalization moves the cost from maintenance to query time. Knowing that is what lets you denormalize deliberately rather than by accident."
+  }
+ ]
+}
